@@ -5,8 +5,6 @@
 using namespace std;
 
 enum State { FIRST, MATCH, NO_MATCH };
-
-// To clear the screen, look up ANSI escape codes
 // Concentration game model
 // The model manages the state of the game
 class Model {
@@ -42,8 +40,8 @@ private:
     // What's the height?
     int height;
     // What'd we flip last?
-    vector <int> lastRow;
-	vector<int>lastColumn;
+    int lastRow;
+    int lastColumn;
     State state;
 };
 
@@ -61,10 +59,10 @@ public:
         model = new Model(8,8);
         view = new View;
     }
-    ~Controller() {
-        delete model;
-        delete view;
-    }
+	~Controller(){
+		delete model;
+		delete view;
+	}
     // Event loop
     void loop();
 private:
@@ -73,47 +71,26 @@ private:
 };
 
 // Constructor initializes the object
-// Constructor initializes the object
 Model::Model(int w, int h) {
     width = w;
     height = h;
-    state = INIT;
+    lastRow = -1;
+    lastColumn = -1;
+    state = FIRST;
     grid = new char*[height];
     visible = new char*[height];
-    // For every row, create the array for that row
     for (int i = 0; i < height; i++) {
         grid[i] = new char[width];
         visible[i] = new char[width];
     }
-    char letter = 'A';
-    // Guarantee pairs of characters in the grid
+	srand(time(0));
+	//look at ascitable.com and do some stuff with rand() %26
+    // TODO: make this random-ish
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            grid[i][j] = letter;
-            // Everything's invisible at first
-            visible[i][j] = '_';
-            // Every other iteration...
-            if (j % 2 == 1) {
-                letter++;
-                if (letter > 'Z') {
-                    letter = 'A';
-                }
-            }
-        }
-    }
-    // Seed random number generator with time
-    srand(time(0));
-    // Randomize
-    int otheri, otherj;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            // Pick a random spot in the grid
-            otheri = rand() % height;
-            otherj = rand() % width;
-            // Swap grid[i][j] with grid[otheri][otherj]
-            letter = grid[i][j];
-            grid[i][j] = grid[otheri][otherj];
-            grid[otheri][otherj] = letter;
+            grid[i][j] = 'a';
+			// everything is invisible at first 
+            visible[i][j] = '*';
         }
     }
 }
@@ -139,37 +116,19 @@ bool Model::matched(int row, int column) {
 void Model::flip(int row, int column) {
     // If the row and column are not valid, break out and don't do anything
     if (!valid(row, column)) { return; }
-    visible[row][column] = grid[row][column];
+    //
+    // If the last selected row and column are invalid,
+        // It means we're selecting the first "cell" to flip
+    // Otherwise, we are selecting the next "cell" to flip
+        // If the last cell and the current cell match, great!
+        // Otherwise, make the last cell invisible (set it to *)
+    // Make the current cell visible
 }
-// If everything is visible, then it's game over
+// TO DO If everything is visible, then it's game over
 bool Model::gameOver() {
-    // Assume the game is over
-    bool isOver = true;
-    // Loop through the grid and see if any element is not visible
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            if (visible[i][j] == '_') {
-                isOver = false;
-            }
-        }
-    }
-    
-    if (isOver) {
-        // Set a nice game over message
-		cout<< "Games over, please play again";
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                visible[i][j] = '_';
-            }
-        }
-        visible[2][3] = 'Y';
-        visible[2][4] = 'O';
-        visible[2][5] = 'U';
-        visible[4][3] = 'W';
-        visible[4][4] = 'I';
-        visible[4][5] = 'N';
-    }
-    return isOver;
+    // Hint: assume the game is over, unless it isn't
+    // Hint: Loop through the grid and see if any element is not visible
+    return false;
 }
 int Model::getWidth() {
     return width;
@@ -208,7 +167,7 @@ void Controller::loop() {
         cin >> col;
         model->flip(row, col);
     }
-    cout << "Hooray, you win!" << endl;
+	cout << "*confetti falls*" << endl;
 }
 
 int main() {
