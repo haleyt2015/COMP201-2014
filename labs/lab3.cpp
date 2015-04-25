@@ -185,6 +185,7 @@ void View::show(Model * model) {
     for (int j = 0; j < model->getWidth(); j++) {
         cout << "\t" << j;
     }
+	
     cout << endl;
     for (int i = 0; i < model->getHeight(); i++) {
         cout << i;
