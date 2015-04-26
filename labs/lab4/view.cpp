@@ -1,6 +1,6 @@
 #include "view.h"
 
-using namespace std;
+using namespace std; 
 
 // Initialize SDL
 View::View(string title, int width, int height) {
